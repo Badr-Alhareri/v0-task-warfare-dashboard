@@ -22,12 +22,6 @@ export function PersonDrawer({ person, open, onClose, tasks }: PersonDrawerProps
 
   const personTasks = tasks.filter((t) => t.assignees.some((a) => a.id === person.id)).slice(0, 5)
 
-  const getReliabilityColor = (val: number) => {
-    if (val >= 90) return "text-success"
-    if (val >= 70) return "text-warning"
-    return "text-destructive"
-  }
-
   return (
     <Sheet open={open} onOpenChange={onClose}>
       <SheetContent className="glass border-border bg-card/95 backdrop-blur-xl w-[400px] sm:w-[450px]">
@@ -44,16 +38,21 @@ export function PersonDrawer({ person, open, onClose, tasks }: PersonDrawerProps
             </Avatar>
             <div>
               <SheetTitle className="text-xl text-foreground">{person.name}</SheetTitle>
-              <Badge variant="secondary" className="mt-1">
-                {person.department}
-              </Badge>
+              <div className="flex items-center gap-2 mt-1">
+                <Badge variant="secondary">{person.department}</Badge>
+                {person.tags.slice(0, 2).map((tag) => (
+                  <Badge key={tag} variant="outline" className="text-xs border-primary/30 text-primary">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
               <p className="text-xs text-muted-foreground mt-1">{person.email}</p>
             </div>
           </div>
         </SheetHeader>
 
         <div className="space-y-6 py-6">
-          {/* Stats Grid */}
+          {/* Stats Grid - Updated to use numeric avgSpeed */}
           <div className="grid grid-cols-3 gap-4">
             <div className="rounded-lg border border-border bg-secondary/30 p-3 text-center">
               <ReliabilityRing value={person.stats.reliability} size={50} />
@@ -62,7 +61,7 @@ export function PersonDrawer({ person, open, onClose, tasks }: PersonDrawerProps
             <div className="rounded-lg border border-border bg-secondary/30 p-3 text-center">
               <div className="flex items-center justify-center h-[50px]">
                 <Clock className="h-5 w-5 text-info mr-1" />
-                <span className="text-lg font-bold text-info">{person.stats.avgSpeed}</span>
+                <span className="text-lg font-bold text-info">{person.stats.avgSpeed}h</span>
               </div>
               <p className="text-xs text-muted-foreground mt-2">Avg Speed</p>
             </div>
@@ -86,32 +85,32 @@ export function PersonDrawer({ person, open, onClose, tasks }: PersonDrawerProps
                 <LineChart data={person.taskHistory}>
                   <XAxis
                     dataKey="date"
-                    tick={{ fill: "oklch(0.65 0.01 260)", fontSize: 10 }}
+                    tick={{ fill: "oklch(0.6 0.01 260)", fontSize: 10 }}
                     axisLine={false}
                     tickLine={false}
                     tickFormatter={(v) => new Date(v).toLocaleDateString("en", { day: "numeric" })}
                   />
                   <YAxis
                     domain={[0, 100]}
-                    tick={{ fill: "oklch(0.65 0.01 260)", fontSize: 10 }}
+                    tick={{ fill: "oklch(0.6 0.01 260)", fontSize: 10 }}
                     axisLine={false}
                     tickLine={false}
                     width={30}
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "oklch(0.15 0.01 260)",
-                      border: "1px solid oklch(0.28 0.01 260)",
+                      backgroundColor: "oklch(0.12 0.01 260)",
+                      border: "1px solid oklch(0.25 0.01 260)",
                       borderRadius: "8px",
                     }}
-                    labelStyle={{ color: "oklch(0.65 0.01 260)" }}
+                    labelStyle={{ color: "oklch(0.6 0.01 260)" }}
                   />
                   <Line
                     type="monotone"
                     dataKey="punctuality"
-                    stroke="oklch(0.75 0.2 145)"
+                    stroke="oklch(0.75 0.18 145)"
                     strokeWidth={2}
-                    dot={{ fill: "oklch(0.75 0.2 145)", r: 3 }}
+                    dot={{ fill: "oklch(0.75 0.18 145)", r: 3 }}
                   />
                 </LineChart>
               </ResponsiveContainer>

@@ -3,11 +3,11 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { LayoutDashboard, Users, Shield } from "lucide-react"
+import { Crosshair, Users, Shield } from "lucide-react"
 
 const navItems = [
-  { href: "/", label: "Live Ops", icon: LayoutDashboard },
-  { href: "/roster", label: "Roster", icon: Users },
+  { href: "/", label: "War Room", icon: Crosshair },
+  { href: "/roster", label: "Personnel", icon: Users },
 ]
 
 export function Navigation() {

@@ -5,30 +5,30 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Plus, CalendarIcon, X, Target } from "lucide-react"
-import { mockPeople, type Person, type Task } from "@/lib/store"
+import { Textarea } from "@/components/ui/textarea"
+import { Plus, CalendarIcon, X, Target, Users, User } from "lucide-react"
+import { useStore, type Person } from "@/lib/store"
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
+import { toast } from "sonner"
 
-interface TaskCreatorProps {
-  onCreateTask: (task: Omit<Task, "id">) => void
-}
-
-export function TaskCreator({ onCreateTask }: TaskCreatorProps) {
+export function TaskCreator() {
+  const { people, addTask } = useStore()
   const [open, setOpen] = useState(false)
   const [title, setTitle] = useState("")
   const [deadline, setDeadline] = useState<Date>()
   const [time, setTime] = useState("12:00")
-  const [priority, setPriority] = useState<Task["priority"]>("medium")
+  const [message, setMessage] = useState("")
   const [assignees, setAssignees] = useState<Person[]>([])
   const [search, setSearch] = useState("")
+  const [isGroupTask, setIsGroupTask] = useState(false)
 
-  const filteredPeople = mockPeople.filter(
+  const filteredPeople = people.filter(
     (p) => p.name.toLowerCase().includes(search.toLowerCase()) && !assignees.some((a) => a.id === p.id),
   )
 
@@ -48,20 +48,29 @@ export function TaskCreator({ onCreateTask }: TaskCreatorProps) {
     const fullDeadline = new Date(deadline)
     fullDeadline.setHours(hours, minutes)
 
-    onCreateTask({
+    addTask({
       title,
       deadline: fullDeadline,
-      priority,
       assignees,
       status: "pending",
+      message,
+      isGroupTask,
+    })
+
+    const taskCount = isGroupTask ? 1 : assignees.length
+    toast.success(`${taskCount} task${taskCount > 1 ? "s" : ""} created`, {
+      description: isGroupTask
+        ? `Group task "${title}" assigned to ${assignees.length} people`
+        : `Individual tasks created for ${assignees.length} assignees`,
     })
 
     // Reset form
     setTitle("")
     setDeadline(undefined)
     setTime("12:00")
-    setPriority("medium")
+    setMessage("")
     setAssignees([])
+    setIsGroupTask(false)
     setOpen(false)
   }
 
@@ -80,8 +89,8 @@ export function TaskCreator({ onCreateTask }: TaskCreatorProps) {
               <Target className="h-4 w-4 text-primary" />
             </div>
             <div>
-              <DialogTitle className="text-foreground">Task Command</DialogTitle>
-              <p className="text-xs text-muted-foreground font-mono">CREATE_MISSION_v1.0</p>
+              <DialogTitle className="text-foreground">Mission Control</DialogTitle>
+              <p className="text-xs text-muted-foreground font-mono">CREATE_TASK_v2.0</p>
             </div>
           </div>
         </DialogHeader>
@@ -133,20 +142,17 @@ export function TaskCreator({ onCreateTask }: TaskCreatorProps) {
             </div>
           </div>
 
-          {/* Priority */}
+          {/* Message */}
           <div className="space-y-2">
-            <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Priority Level</Label>
-            <Select value={priority} onValueChange={(v) => setPriority(v as Task["priority"])}>
-              <SelectTrigger className="border-border bg-secondary/30">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-popover border-border">
-                <SelectItem value="low">Low</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="high">High</SelectItem>
-                <SelectItem value="critical">Critical</SelectItem>
-              </SelectContent>
-            </Select>
+            <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Message (Optional)
+            </Label>
+            <Textarea
+              placeholder="Additional instructions or context..."
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              className="border-border bg-secondary/30 focus-visible:ring-primary resize-none h-20"
+            />
           </div>
 
           {/* Assignees */}
@@ -178,7 +184,7 @@ export function TaskCreator({ onCreateTask }: TaskCreatorProps) {
                 />
               </div>
               {search && filteredPeople.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-1 rounded-lg border border-border bg-popover shadow-lg z-10">
+                <div className="absolute top-full left-0 right-0 mt-1 rounded-lg border border-border bg-popover shadow-lg z-10 max-h-48 overflow-auto">
                   {filteredPeople.map((person) => (
                     <button
                       key={person.id}
@@ -189,9 +195,16 @@ export function TaskCreator({ onCreateTask }: TaskCreatorProps) {
                         <AvatarImage src={person.avatar || "/placeholder.svg"} />
                         <AvatarFallback className="text-xs">{person.name[0]}</AvatarFallback>
                       </Avatar>
-                      <div>
+                      <div className="flex-1">
                         <span className="text-sm">{person.name}</span>
                         <span className="text-xs text-muted-foreground ml-2">{person.department}</span>
+                      </div>
+                      <div className="flex gap-1">
+                        {person.tags.slice(0, 2).map((tag) => (
+                          <Badge key={tag} variant="outline" className="text-[10px] px-1 py-0">
+                            {tag}
+                          </Badge>
+                        ))}
                       </div>
                     </button>
                   ))}
@@ -199,6 +212,38 @@ export function TaskCreator({ onCreateTask }: TaskCreatorProps) {
               )}
             </div>
           </div>
+
+          {assignees.length > 1 && (
+            <div className="flex items-center justify-between rounded-lg border border-border bg-secondary/20 p-3">
+              <div className="flex items-center gap-3">
+                <div
+                  className={cn(
+                    "flex h-8 w-8 items-center justify-center rounded",
+                    isGroupTask ? "bg-primary/20" : "bg-muted",
+                  )}
+                >
+                  {isGroupTask ? (
+                    <Users className="h-4 w-4 text-primary" />
+                  ) : (
+                    <User className="h-4 w-4 text-muted-foreground" />
+                  )}
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-foreground">
+                    {isGroupTask ? "Group Task" : "Individual Tasks"}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {isGroupTask ? "Single task shared by all assignees" : `Creates ${assignees.length} separate tasks`}
+                  </p>
+                </div>
+              </div>
+              <Switch
+                checked={isGroupTask}
+                onCheckedChange={setIsGroupTask}
+                className="data-[state=checked]:bg-primary"
+              />
+            </div>
+          )}
 
           {/* Actions */}
           <div className="flex justify-end gap-2 pt-2">
@@ -211,7 +256,7 @@ export function TaskCreator({ onCreateTask }: TaskCreatorProps) {
               className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2"
             >
               <Plus className="h-4 w-4" />
-              Create Task
+              Create {isGroupTask || assignees.length <= 1 ? "Task" : `${assignees.length} Tasks`}
             </Button>
           </div>
         </div>

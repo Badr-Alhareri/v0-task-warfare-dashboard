@@ -7,8 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { X, Send, Terminal, Zap } from "lucide-react"
-import type { Task, Person } from "@/lib/store"
-import { mockPeople } from "@/lib/store"
+import { useStore, type Task, type Person } from "@/lib/store"
 
 interface ChaserModalProps {
   task: Task | null
@@ -18,24 +17,24 @@ interface ChaserModalProps {
 }
 
 export function ChaserModal({ task, open, onClose, onSend }: ChaserModalProps) {
+  const { people } = useStore()
   const [recipients, setRecipients] = useState<Person[]>([])
   const [ccRecipients, setCcRecipients] = useState<Person[]>([])
   const [ccSearch, setCcSearch] = useState("")
   const [subject, setSubject] = useState("")
   const [body, setBody] = useState("")
 
-  // Initialize when task changes
   useMemo(() => {
     if (task) {
       setRecipients(task.assignees)
-      setSubject(`ACTION REQUIRED: "${task.title}" is Overdue`)
+      setSubject(`URGENT: ${task.title} is Overdue`)
       setBody(
         `Hi Team,\n\nThis is an urgent follow-up regarding the task "${task.title}" which was due on ${task.deadline.toLocaleDateString()}.\n\nPlease provide a status update at your earliest convenience.\n\nBest regards`,
       )
     }
   }, [task])
 
-  const filteredPeople = mockPeople.filter(
+  const filteredPeople = people.filter(
     (p) =>
       p.name.toLowerCase().includes(ccSearch.toLowerCase()) &&
       !recipients.some((r) => r.id === p.id) &&

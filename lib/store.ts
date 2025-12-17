@@ -1,3 +1,5 @@
+import { create } from "zustand"
+
 export type TaskStatus = "pending" | "completed" | "late_completed"
 
 export interface Person {
@@ -6,9 +8,10 @@ export interface Person {
   email: string
   avatar: string
   department: string
+  tags: string[]
   stats: {
     reliability: number
-    avgSpeed: string
+    avgSpeed: number // hours
     lateRate: number
   }
   taskHistory: { date: string; punctuality: number }[]
@@ -21,18 +24,20 @@ export interface Task {
   deadline: Date
   status: TaskStatus
   completedAt?: Date
-  priority: "low" | "medium" | "high" | "critical"
+  message?: string
+  isGroupTask: boolean
 }
 
-// Mock People Database
-export const mockPeople: Person[] = [
+// Mock People Database with tags
+const initialPeople: Person[] = [
   {
     id: "1",
     name: "Alex Chen",
     email: "alex.chen@company.com",
     avatar: "/professional-asian-man.png",
     department: "Engineering",
-    stats: { reliability: 94, avgSpeed: "1.5h", lateRate: 6 },
+    tags: ["Dev", "Core", "Backend"],
+    stats: { reliability: 94, avgSpeed: 1.5, lateRate: 6 },
     taskHistory: [
       { date: "2025-12-10", punctuality: 100 },
       { date: "2025-12-11", punctuality: 95 },
@@ -47,7 +52,8 @@ export const mockPeople: Person[] = [
     email: "sarah.miller@company.com",
     avatar: "/professional-blonde-woman.png",
     department: "Design",
-    stats: { reliability: 87, avgSpeed: "2h", lateRate: 13 },
+    tags: ["Design", "UI", "Core"],
+    stats: { reliability: 87, avgSpeed: 2, lateRate: 13 },
     taskHistory: [
       { date: "2025-12-10", punctuality: 85 },
       { date: "2025-12-11", punctuality: 90 },
@@ -62,7 +68,8 @@ export const mockPeople: Person[] = [
     email: "james.wilson@company.com",
     avatar: "/professional-man-glasses.jpg",
     department: "Product",
-    stats: { reliability: 72, avgSpeed: "3h", lateRate: 28 },
+    tags: ["Product", "Strategy"],
+    stats: { reliability: 72, avgSpeed: 3, lateRate: 28 },
     taskHistory: [
       { date: "2025-12-10", punctuality: 70 },
       { date: "2025-12-11", punctuality: 75 },
@@ -77,7 +84,8 @@ export const mockPeople: Person[] = [
     email: "emily.davis@company.com",
     avatar: "/professional-woman-dark-hair.png",
     department: "Marketing",
-    stats: { reliability: 96, avgSpeed: "1h", lateRate: 4 },
+    tags: ["Marketing", "Core"],
+    stats: { reliability: 96, avgSpeed: 1, lateRate: 4 },
     taskHistory: [
       { date: "2025-12-10", punctuality: 98 },
       { date: "2025-12-11", punctuality: 95 },
@@ -92,7 +100,8 @@ export const mockPeople: Person[] = [
     email: "michael.brown@company.com",
     avatar: "/professional-man-beard.png",
     department: "Engineering",
-    stats: { reliability: 65, avgSpeed: "4h", lateRate: 35 },
+    tags: ["Dev", "Urgent", "Backend"],
+    stats: { reliability: 65, avgSpeed: 4, lateRate: 35 },
     taskHistory: [
       { date: "2025-12-10", punctuality: 60 },
       { date: "2025-12-11", punctuality: 65 },
@@ -107,7 +116,8 @@ export const mockPeople: Person[] = [
     email: "lisa.wang@company.com",
     avatar: "/professional-asian-woman.png",
     department: "Design",
-    stats: { reliability: 91, avgSpeed: "1.8h", lateRate: 9 },
+    tags: ["Design", "UI", "Urgent"],
+    stats: { reliability: 91, avgSpeed: 1.8, lateRate: 9 },
     taskHistory: [
       { date: "2025-12-10", punctuality: 92 },
       { date: "2025-12-11", punctuality: 89 },
@@ -124,75 +134,130 @@ const hoursAgo = (h: number) => new Date(now.getTime() - h * 60 * 60 * 1000)
 const hoursFromNow = (h: number) => new Date(now.getTime() + h * 60 * 60 * 1000)
 const daysAgo = (d: number) => new Date(now.getTime() - d * 24 * 60 * 60 * 1000)
 
-export const mockTasks: Task[] = [
+const initialTasks: Task[] = [
   {
     id: "1",
     title: "Deploy authentication microservice",
-    assignees: [mockPeople[0], mockPeople[4]],
+    assignees: [initialPeople[0], initialPeople[4]],
     deadline: hoursAgo(48),
     status: "pending",
-    priority: "critical",
+    isGroupTask: true,
   },
   {
     id: "2",
     title: "Review Q4 marketing campaign",
-    assignees: [mockPeople[3]],
+    assignees: [initialPeople[3]],
     deadline: hoursAgo(24),
     status: "pending",
-    priority: "high",
+    isGroupTask: false,
   },
   {
     id: "3",
     title: "Update design system components",
-    assignees: [mockPeople[1], mockPeople[5]],
+    assignees: [initialPeople[1], initialPeople[5]],
     deadline: hoursFromNow(2),
     status: "pending",
-    priority: "medium",
+    isGroupTask: true,
   },
   {
     id: "4",
     title: "Finalize product roadmap presentation",
-    assignees: [mockPeople[2]],
+    assignees: [initialPeople[2]],
     deadline: hoursFromNow(6),
     status: "pending",
-    priority: "high",
+    isGroupTask: false,
   },
   {
     id: "5",
     title: "Complete API documentation",
-    assignees: [mockPeople[0]],
+    assignees: [initialPeople[0]],
     deadline: daysAgo(2),
     status: "completed",
     completedAt: daysAgo(2.5),
-    priority: "medium",
+    isGroupTask: false,
   },
   {
     id: "6",
     title: "Security audit remediation",
-    assignees: [mockPeople[4], mockPeople[0]],
+    assignees: [initialPeople[4], initialPeople[0]],
     deadline: daysAgo(3),
     status: "late_completed",
     completedAt: daysAgo(2),
-    priority: "critical",
+    isGroupTask: true,
   },
   {
     id: "7",
     title: "User research synthesis",
-    assignees: [mockPeople[1]],
+    assignees: [initialPeople[1]],
     deadline: daysAgo(1),
     status: "completed",
     completedAt: daysAgo(1.2),
-    priority: "low",
+    isGroupTask: false,
   },
   {
     id: "8",
     title: "Database optimization sprint",
-    assignees: [mockPeople[0], mockPeople[4]],
+    assignees: [initialPeople[0], initialPeople[4]],
     deadline: hoursFromNow(24),
     status: "pending",
-    priority: "high",
+    isGroupTask: true,
   },
 ]
+
+interface StoreState {
+  people: Person[]
+  tasks: Task[]
+  addPerson: (person: Omit<Person, "id" | "stats" | "taskHistory">) => void
+  addTask: (task: Omit<Task, "id">) => void
+  updateTaskStatus: (taskId: string, status: TaskStatus, completedAt?: Date) => void
+  archiveTask: (taskId: string) => void
+}
+
+export const useStore = create<StoreState>((set) => ({
+  people: initialPeople,
+  tasks: initialTasks,
+
+  addPerson: (personData) => {
+    const newPerson: Person = {
+      ...personData,
+      id: Date.now().toString(),
+      stats: { reliability: 100, avgSpeed: 0, lateRate: 0 },
+      taskHistory: [],
+    }
+    set((state) => ({ people: [...state.people, newPerson] }))
+  },
+
+  addTask: (taskData) => {
+    if (taskData.isGroupTask) {
+      // Group Mode: Create single task with all assignees
+      const newTask: Task = {
+        ...taskData,
+        id: Date.now().toString(),
+      }
+      set((state) => ({ tasks: [newTask, ...state.tasks] }))
+    } else {
+      // Individual Mode: Create separate task for each assignee
+      const newTasks = taskData.assignees.map((assignee, index) => ({
+        ...taskData,
+        id: `${Date.now()}-${index}`,
+        assignees: [assignee],
+      }))
+      set((state) => ({ tasks: [...newTasks, ...state.tasks] }))
+    }
+  },
+
+  updateTaskStatus: (taskId, status, completedAt) => {
+    set((state) => ({
+      tasks: state.tasks.map((t) => (t.id === taskId ? { ...t, status, completedAt } : t)),
+    }))
+  },
+
+  archiveTask: (taskId) => {
+    set((state) => ({
+      tasks: state.tasks.filter((t) => t.id !== taskId),
+    }))
+  },
+}))
 
 // Helper to determine if a task is urgent (overdue and still pending)
 export function isTaskUrgent(task: Task): boolean {
@@ -225,4 +290,11 @@ export function formatRelativeTime(date: Date): string {
     if (absHours < 24) return `${absHours} hour${absHours > 1 ? "s" : ""} ago`
     return `${absDays} day${absDays > 1 ? "s" : ""} ago`
   }
+}
+
+// Get all unique tags from people
+export function getAllTags(people: Person[]): string[] {
+  const tagSet = new Set<string>()
+  people.forEach((p) => p.tags.forEach((t) => tagSet.add(t)))
+  return Array.from(tagSet).sort()
 }

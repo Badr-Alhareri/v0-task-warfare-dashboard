@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import { motion } from "framer-motion"
 import { LiveClock } from "@/components/live-clock"
 import { SystemStatus } from "@/components/system-status"
@@ -8,33 +7,30 @@ import { TaskTable } from "@/components/task-table"
 import { TaskCreator } from "@/components/task-creator"
 import { ChaserModal } from "@/components/chaser-modal"
 import { Navigation, Logo } from "@/components/navigation"
-import { mockTasks, type Task } from "@/lib/store"
+import { useStore, type Task, getTaskDisplayStatus } from "@/lib/store"
 import { toast } from "sonner"
 import { Toaster } from "@/components/ui/sonner"
+import { useState } from "react"
 
 export default function DashboardPage() {
-  const [tasks, setTasks] = useState<Task[]>(mockTasks)
+  const { tasks, updateTaskStatus, archiveTask } = useStore()
   const [chaserTask, setChaserTask] = useState<Task | null>(null)
 
-  const handleMarkComplete = (taskId: string) => {
-    setTasks((prev) =>
-      prev.map((t) =>
-        t.id === taskId
-          ? {
-              ...t,
-              status: new Date() > t.deadline ? "late_completed" : "completed",
-              completedAt: new Date(),
-            }
-          : t,
-      ),
-    )
-    toast.success("Task marked as complete", {
-      description: "The task status has been updated.",
+  const activeTasks = tasks.filter((t) => {
+    const status = getTaskDisplayStatus(t)
+    return status === "pending" || status === "urgent"
+  })
+
+  const handleMarkComplete = (taskId: string, isLate: boolean) => {
+    const status = isLate ? "late_completed" : "completed"
+    updateTaskStatus(taskId, status, new Date())
+    toast.success(isLate ? "Task marked as late completed" : "Task completed on time", {
+      description: "The task has been moved to archive.",
     })
   }
 
   const handleArchive = (taskId: string) => {
-    setTasks((prev) => prev.filter((t) => t.id !== taskId))
+    archiveTask(taskId)
     toast.info("Task archived", {
       description: "The task has been removed from the dashboard.",
     })
@@ -43,17 +39,6 @@ export default function DashboardPage() {
   const handleSendChaser = (data: { to: string[]; cc: string[]; subject: string; body: string }) => {
     toast.success("Chaser email sent", {
       description: `Email sent to ${data.to.join(", ")}`,
-    })
-  }
-
-  const handleCreateTask = (taskData: Omit<Task, "id">) => {
-    const newTask: Task = {
-      ...taskData,
-      id: Date.now().toString(),
-    }
-    setTasks((prev) => [newTask, ...prev])
-    toast.success("Task created", {
-      description: `"${taskData.title}" has been added to the queue.`,
     })
   }
 
@@ -84,14 +69,16 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-foreground">Operations Dashboard</h1>
-              <p className="text-sm text-muted-foreground">Monitor and manage active tasks across your team</p>
+              <p className="text-sm text-muted-foreground">
+                Active missions requiring attention • Completed tasks auto-archive
+              </p>
             </div>
-            <TaskCreator onCreateTask={handleCreateTask} />
+            <TaskCreator />
           </div>
 
-          {/* Task Table */}
+          {/* Task Table - Only showing active tasks */}
           <TaskTable
-            tasks={tasks}
+            tasks={activeTasks}
             onMarkComplete={handleMarkComplete}
             onSendChaser={(task) => setChaserTask(task)}
             onArchive={handleArchive}

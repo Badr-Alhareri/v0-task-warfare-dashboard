@@ -3,87 +3,94 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Cyberpunk dark theme with neon accents */
+/* Updated color scheme: Neon Cyan (Active), Electric Orange (Late), Critical Red (Failed), Emerald (Success) */
 :root {
-  --background: oklch(0.12 0.01 260);
+  --background: oklch(0.08 0.01 260);
   --foreground: oklch(0.95 0.01 260);
-  --card: oklch(0.15 0.01 260);
+  --card: oklch(0.12 0.01 260);
   --card-foreground: oklch(0.95 0.01 260);
-  --popover: oklch(0.13 0.01 260);
+  --popover: oklch(0.1 0.01 260);
   --popover-foreground: oklch(0.95 0.01 260);
-  --primary: oklch(0.75 0.2 145);
-  --primary-foreground: oklch(0.12 0.01 260);
-  --secondary: oklch(0.22 0.01 260);
+  /* Neon Cyan - Primary/Active */
+  --primary: oklch(0.78 0.15 195);
+  --primary-foreground: oklch(0.08 0.01 260);
+  --secondary: oklch(0.18 0.01 260);
   --secondary-foreground: oklch(0.95 0.01 260);
-  --muted: oklch(0.22 0.01 260);
-  --muted-foreground: oklch(0.65 0.01 260);
+  --muted: oklch(0.2 0.01 260);
+  --muted-foreground: oklch(0.6 0.01 260);
+  /* Electric Orange - Warning/Late */
   --accent: oklch(0.75 0.18 55);
-  --accent-foreground: oklch(0.12 0.01 260);
-  --destructive: oklch(0.55 0.22 25);
+  --accent-foreground: oklch(0.08 0.01 260);
+  /* Critical Red - Destructive/Failed */
+  --destructive: oklch(0.55 0.25 25);
   --destructive-foreground: oklch(0.95 0.01 260);
-  --border: oklch(0.28 0.01 260);
-  --input: oklch(0.22 0.01 260);
-  --ring: oklch(0.75 0.2 145);
-  --chart-1: oklch(0.75 0.2 145);
-  --chart-2: oklch(0.75 0.18 55);
-  --chart-3: oklch(0.55 0.22 25);
-  --chart-4: oklch(0.6 0.15 250);
-  --chart-5: oklch(0.7 0.12 200);
+  --border: oklch(0.25 0.01 260);
+  --input: oklch(0.18 0.01 260);
+  --ring: oklch(0.78 0.15 195);
+  --chart-1: oklch(0.75 0.18 145);
+  --chart-2: oklch(0.78 0.15 195);
+  --chart-3: oklch(0.75 0.18 55);
+  --chart-4: oklch(0.55 0.25 25);
+  --chart-5: oklch(0.6 0.15 250);
   --radius: 0.5rem;
-  --sidebar: oklch(0.13 0.01 260);
+  --sidebar: oklch(0.1 0.01 260);
   --sidebar-foreground: oklch(0.95 0.01 260);
-  --sidebar-primary: oklch(0.75 0.2 145);
-  --sidebar-primary-foreground: oklch(0.12 0.01 260);
-  --sidebar-accent: oklch(0.22 0.01 260);
+  --sidebar-primary: oklch(0.78 0.15 195);
+  --sidebar-primary-foreground: oklch(0.08 0.01 260);
+  --sidebar-accent: oklch(0.18 0.01 260);
   --sidebar-accent-foreground: oklch(0.95 0.01 260);
-  --sidebar-border: oklch(0.28 0.01 260);
-  --sidebar-ring: oklch(0.75 0.2 145);
+  --sidebar-border: oklch(0.25 0.01 260);
+  --sidebar-ring: oklch(0.78 0.15 195);
 
   /* Custom accent colors */
-  --success: oklch(0.75 0.2 145);
+  /* Emerald - Success */
+  --success: oklch(0.75 0.18 145);
+  /* Electric Orange - Warning/Late */
   --warning: oklch(0.75 0.18 55);
-  --danger: oklch(0.55 0.22 25);
-  --info: oklch(0.6 0.15 250);
+  /* Critical Red - Danger/Failed */
+  --danger: oklch(0.55 0.25 25);
+  /* Neon Cyan - Info/Active */
+  --info: oklch(0.78 0.15 195);
 }
 
 .dark {
-  --background: oklch(0.12 0.01 260);
+  --background: oklch(0.08 0.01 260);
   --foreground: oklch(0.95 0.01 260);
-  --card: oklch(0.15 0.01 260);
+  --card: oklch(0.12 0.01 260);
   --card-foreground: oklch(0.95 0.01 260);
-  --popover: oklch(0.13 0.01 260);
+  --popover: oklch(0.1 0.01 260);
   --popover-foreground: oklch(0.95 0.01 260);
-  --primary: oklch(0.75 0.2 145);
-  --primary-foreground: oklch(0.12 0.01 260);
-  --secondary: oklch(0.22 0.01 260);
+  --primary: oklch(0.78 0.15 195);
+  --primary-foreground: oklch(0.08 0.01 260);
+  --secondary: oklch(0.18 0.01 260);
   --secondary-foreground: oklch(0.95 0.01 260);
-  --muted: oklch(0.22 0.01 260);
-  --muted-foreground: oklch(0.65 0.01 260);
+  --muted: oklch(0.2 0.01 260);
+  --muted-foreground: oklch(0.6 0.01 260);
   --accent: oklch(0.75 0.18 55);
-  --accent-foreground: oklch(0.12 0.01 260);
-  --destructive: oklch(0.55 0.22 25);
+  --accent-foreground: oklch(0.08 0.01 260);
+  --destructive: oklch(0.55 0.25 25);
   --destructive-foreground: oklch(0.95 0.01 260);
-  --border: oklch(0.28 0.01 260);
-  --input: oklch(0.22 0.01 260);
-  --ring: oklch(0.75 0.2 145);
-  --chart-1: oklch(0.75 0.2 145);
-  --chart-2: oklch(0.75 0.18 55);
-  --chart-3: oklch(0.55 0.22 25);
-  --chart-4: oklch(0.6 0.15 250);
-  --chart-5: oklch(0.7 0.12 200);
-  --sidebar: oklch(0.13 0.01 260);
+  --border: oklch(0.25 0.01 260);
+  --input: oklch(0.18 0.01 260);
+  --ring: oklch(0.78 0.15 195);
+  --chart-1: oklch(0.75 0.18 145);
+  --chart-2: oklch(0.78 0.15 195);
+  --chart-3: oklch(0.75 0.18 55);
+  --chart-4: oklch(0.55 0.25 25);
+  --chart-5: oklch(0.6 0.15 250);
+  --sidebar: oklch(0.1 0.01 260);
   --sidebar-foreground: oklch(0.95 0.01 260);
-  --sidebar-primary: oklch(0.75 0.2 145);
-  --sidebar-primary-foreground: oklch(0.12 0.01 260);
-  --sidebar-accent: oklch(0.22 0.01 260);
+  --sidebar-primary: oklch(0.78 0.15 195);
+  --sidebar-primary-foreground: oklch(0.08 0.01 260);
+  --sidebar-accent: oklch(0.18 0.01 260);
   --sidebar-accent-foreground: oklch(0.95 0.01 260);
-  --sidebar-border: oklch(0.28 0.01 260);
-  --sidebar-ring: oklch(0.75 0.2 145);
+  --sidebar-border: oklch(0.25 0.01 260);
+  --sidebar-ring: oklch(0.78 0.15 195);
 
-  --success: oklch(0.75 0.2 145);
+  --success: oklch(0.75 0.18 145);
   --warning: oklch(0.75 0.18 55);
-  --danger: oklch(0.55 0.22 25);
-  --info: oklch(0.6 0.15 250);
+  --danger: oklch(0.55 0.25 25);
+  --info: oklch(0.78 0.15 195);
 }
 
 @theme inline {
@@ -170,19 +177,24 @@
 }
 
 .glass {
-  background: rgba(15, 15, 25, 0.8);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(10, 10, 20, 0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+/* Updated glow colors to match new scheme */
 .glow-success {
-  box-shadow: 0 0 10px oklch(0.75 0.2 145 / 0.3), 0 0 20px oklch(0.75 0.2 145 / 0.1);
+  box-shadow: 0 0 12px oklch(0.75 0.18 145 / 0.35), 0 0 24px oklch(0.75 0.18 145 / 0.15);
 }
 
 .glow-warning {
-  box-shadow: 0 0 10px oklch(0.75 0.18 55 / 0.3), 0 0 20px oklch(0.75 0.18 55 / 0.1);
+  box-shadow: 0 0 12px oklch(0.75 0.18 55 / 0.35), 0 0 24px oklch(0.75 0.18 55 / 0.15);
 }
 
 .glow-danger {
-  box-shadow: 0 0 10px oklch(0.55 0.22 25 / 0.3), 0 0 20px oklch(0.55 0.22 25 / 0.1);
+  box-shadow: 0 0 12px oklch(0.55 0.25 25 / 0.35), 0 0 24px oklch(0.55 0.25 25 / 0.15);
+}
+
+.glow-info {
+  box-shadow: 0 0 12px oklch(0.78 0.15 195 / 0.35), 0 0 24px oklch(0.78 0.15 195 / 0.15);
 }
